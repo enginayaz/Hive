@@ -23,8 +23,6 @@
 		30F2B70F1415565F00597A7B /* ofxCvImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30F2B6701415565D00597A7B /* ofxCvImage.cpp */; };
 		30F2B7101415565F00597A7B /* ofxCvShortImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30F2B6731415565D00597A7B /* ofxCvShortImage.cpp */; };
 		7F705EB914F72E150066E508 /* Status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F705EB814F72E150066E508 /* Status.cpp */; };
-		7FEDF26115066D160015C76D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDF25915066D160015C76D /* main.cpp */; };
-		7FEDF26215066D160015C76D /* testApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDF25A15066D160015C76D /* testApp.cpp */; };
 		7FEDF26315066D160015C76D /* ofxTextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDF25E15066D160015C76D /* ofxTextBlock.cpp */; };
 		7FF9117D14F6E6AF00E05F24 /* ofxHttpUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FF9117914F6E6AF00E05F24 /* ofxHttpUtils.cpp */; };
 		7FF911BA14F714AE00E05F24 /* Seat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FF911B914F714AE00E05F24 /* Seat.cpp */; };
@@ -184,9 +182,6 @@
 		30F2B6751415565D00597A7B /* ofxOpenCv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOpenCv.h; sourceTree = "<group>"; };
 		7F705EB814F72E150066E508 /* Status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Status.cpp; sourceTree = "<group>"; };
 		7F705EBA14F72E1B0066E508 /* Status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Status.h; sourceTree = "<group>"; };
-		7FEDF25915066D160015C76D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		7FEDF25A15066D160015C76D /* testApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testApp.cpp; sourceTree = "<group>"; };
-		7FEDF25B15066D160015C76D /* testApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testApp.h; sourceTree = "<group>"; };
 		7FEDF25C15066D160015C76D /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
 		7FEDF25E15066D160015C76D /* ofxTextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTextBlock.cpp; sourceTree = "<group>"; };
 		7FEDF25F15066D160015C76D /* ofxTextBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTextBlock.h; sourceTree = "<group>"; };
@@ -596,22 +591,11 @@
 		7FEDF25715066D160015C76D /* ofxTextSuite */ = {
 			isa = PBXGroup;
 			children = (
-				7FEDF25815066D160015C76D /* example */,
 				7FEDF25C15066D160015C76D /* install.xml */,
 				7FEDF25D15066D160015C76D /* src */,
 			);
 			name = ofxTextSuite;
 			path = ../../../addons/ofxTextSuite;
-			sourceTree = "<group>";
-		};
-		7FEDF25815066D160015C76D /* example */ = {
-			isa = PBXGroup;
-			children = (
-				7FEDF25915066D160015C76D /* main.cpp */,
-				7FEDF25A15066D160015C76D /* testApp.cpp */,
-				7FEDF25B15066D160015C76D /* testApp.h */,
-			);
-			path = example;
 			sourceTree = "<group>";
 		};
 		7FEDF25D15066D160015C76D /* src */ = {
@@ -861,8 +845,6 @@
 				7FF911BC14F71B2F00E05F24 /* Sensor.cpp in Sources */,
 				7FF911C014F71B6900E05F24 /* StatusReader.cpp in Sources */,
 				7F705EB914F72E150066E508 /* Status.cpp in Sources */,
-				7FEDF26115066D160015C76D /* main.cpp in Sources */,
-				7FEDF26215066D160015C76D /* testApp.cpp in Sources */,
 				7FEDF26315066D160015C76D /* ofxTextBlock.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

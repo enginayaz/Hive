@@ -3,13 +3,28 @@ using namespace std;
 
 //--------------------------------------------------------------
 void testApp::setup() {
-	//create 4 seats (with their numbers)
+    ofBackground(0,0,0);
+    numberOfSeats = 4;	
+    //create 4 seats (with their numbers)
     seats[0] = Seat(0); //add params: initialX, initialY
     seats[1] = Seat(1);
     seats[2] = Seat(2);
     seats[3] = Seat(3);
     
+    maxTextWidth = 167;
+    
     loadImages();
+    alignment = OF_TEXT_ALIGN_LEFT;
+    for(int i = 0; i < numberOfSeats; i++){
+        ofxTextBlock textBlock;
+        textBlock.init("verdana.ttf", 14);
+        statusTextBoxes.push_back(textBlock);
+        
+        //statusTextBoxes[i].wrapTextArea(167,50);
+        
+        
+    }
+    welcomeText.init("verdana.ttf", 14);
     
     lastWebUpdate = time(0);
     webUpdateInterval = 1;   
@@ -24,7 +39,8 @@ void testApp::loadImages(){
     halos.push_back(ofImage("images/haloStuck.png"));
     halos.push_back(ofImage("images/haloFeedback.png"));
     halos.push_back(ofImage("images/haloNoStatus.png"));
-    halos.push_back(ofImage("images/haloHive.png"));
+    halos.push_back(ofImage("images/haloHive.png"));    
+    
     
     logos.push_back(ofImage("images/logoBusy.png"));
     logos.push_back(ofImage("images/logoAvailable.png"));
@@ -39,35 +55,19 @@ void testApp::loadImages(){
     smallLogos.push_back(ofImage("images/smallLogoFeedback.png"));    
     smallLogos.push_back(ofImage("images/smallLogoNoStatus.png"));
     
+    for(int i = 0; i < halos.size(); i++){
+        halos[i].setImageType(OF_IMAGE_COLOR_ALPHA); 
+    }
+    for(int i = 0; i < logos.size(); i++){
+        logos[i].setImageType(OF_IMAGE_COLOR_ALPHA); 
+        logos[i].rotate90(1);
+    }
+    for(int i = 0; i < smallLogos.size(); i++){
+        smallLogos[i].setImageType(OF_IMAGE_COLOR_ALPHA); 
+    }
+    
     hiveLogo = ofImage("images/hiveLogo.png");
-    
-    /*
-    verdana14.loadFont("verdana.ttf", 14, true, true);
-	verdana14.setLineHeight(18.0f);
-	verdana14.setLetterSpacing(1.037);
-    
-	verdana30.loadFont("verdana.ttf", 30, true, true);
-	verdana30.setLineHeight(34.0f);
-	verdana30.setLetterSpacing(1.035);
-    */
-    /*
-    
-    ofxTextBlock text1, text2, text3, text4;
-    text1.init("verdana.ttf", 14);
-    text2.init("verdana.ttf", 14);
-    text3.init("verdana.ttf", 14);
-    text4.init("verdana.ttf", 14);
-    
-    textBoxes.push_back(text1);
-    textBoxes.push_back(text2);
-    textBoxes.push_back(text3);
-    textBoxes.push_back(text4);
-    
-    for(int i = 0; i < textBoxes.size(); i++){
-        textBoxes[i].wrapTextX(160);
-    }*/
-    
-    
+    hiveLogo.setImageType(OF_IMAGE_COLOR_ALPHA);    
    
 }
 
@@ -101,7 +101,7 @@ void testApp::update() {
             lastWebUpdate = time(0);
         }
         
-        for(int i = 0; i < 4; i++){ //seats # hardcoded (there's no array.length. this should eventually be a vector)
+        for(int i = 0; i < numberOfSeats; i++){ //seats # hardcoded (there's no array.length. this should eventually be a vector)
             if(seats[i].taken){
                 Status newStatus = statusReader.getLatestStatusFor(seats[i].number);
                 //if new status is not null
@@ -146,7 +146,7 @@ void testApp::draw() {
         //sensor.draw(this); 
     }
        
-    for(int i = 0; i < 4; i++){ //seats # hardcoded 
+    for(int i = 0; i < numberOfSeats; i++){ 
         draw(seats[i]);        
     }    
     
@@ -157,35 +157,40 @@ void testApp::draw(Seat seat){
     
     ofSetColor(255, 255, 255);
     
+    halos[status].resize(245, 171);
     halos[status].draw(seat.x, seat.y);
     if(seat.taken){
         Tag status = seat.status.currentStatus; 
         if(seat.status.currentStatus != NO_STATUS){
-            logos[status].draw(seat.x - 62, seat.y - 30);              
-            smallLogos[status].draw(seat.x + 192, seat.y + 121); 
-        }     
-        //verdana14.drawString(seat.status.currentMessage, seat.x - 62, seat.y + 11);
-        /*
-        textBoxes[status].setText(seat.status.currentMessage);
-        textBoxes[status].draw(seat.x - 62, seat.y + 11);
-         */
+            logos[status].resize(50, 33);          
+            
+            logos[status].draw(seat.x - 60, seat.y - 30);  //w:50, h:33
+            smallLogos[status].resize(24, 22);
+            smallLogos[status].draw(seat.x + 192, seat.y + 122);//w:24, h:22
+            
+            
+        }   
+        
+        statusTextBoxes[status].setText(seat.status.currentMessage);        
+        statusTextBoxes[status].wrapTextX(maxTextWidth);
+        welcomeText.wrapTextX(176); //height: 39.
+        ofPushMatrix();
+            ofTranslate(seat.x - 10, seat.y + 3);
+            ofRotate(90); 
+            statusTextBoxes[status].draw(0, 0);
+        ofPopMatrix();
+        
+         
                
     }  
     else{
-        hiveLogo.draw(seat.x + 35, seat.y + 105);
-        //verdana14.drawString("Login URL", seat.x - 62, seat.y + 11); 
+        hiveLogo.resize(55, 49);        
+        hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
+        welcomeText.setText("Login URL");
+        welcomeText.wrapTextX(maxTextWidth);
+        welcomeText.draw(seat.x + 35, seat.y + 105);         
     }
     
-    /*
-     //Font Usage:
-     verdana14.drawString("anti aliased", 145, 92);
-     verdana14.drawString("anti aliased", 145, 195);
-     verdana14A.drawString("aliased", 525, 92);
-     
-     ofSetColor(225);
-     verdana14.drawString("verdana 30pt - ", 30, 195);
-     verdana30.drawString(typeStr, 30, 229);
-     */
 }
 
 

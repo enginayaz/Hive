@@ -40,6 +40,7 @@ public:
     
     time_t lastWebUpdate;
     int webUpdateInterval;
+    int numberOfSeats;
     
 private:
     void draw(Seat seat);
@@ -52,7 +53,9 @@ private:
     //dateTime lastTimeReadStatus
     ofTrueTypeFont	verdana14; //font sizes?
     ofTrueTypeFont	verdana30;
-    //vector<ofxTextBlock> textBoxes;
-    //TextBlockAlignment  alignment;
+    vector<ofxTextBlock> statusTextBoxes;
+    ofxTextBlock welcomeText;
+    TextBlockAlignment  alignment;
+    int maxTextWidth;
    
 };
