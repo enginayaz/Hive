@@ -16,7 +16,7 @@ Seat::Seat(){
     
     currentMessage = "nothing yet";    
     currentStatus = NO_STATUS;
-    timeStamp = ""; 
+    timeStamp = 0; 
 }
 
 Seat::Seat(int _number){    
@@ -26,7 +26,7 @@ Seat::Seat(int _number){
     
     currentMessage = "nothing yet";    
     currentStatus = NO_STATUS;
-    timeStamp = ""; 
+    timeStamp = 0; 
 }
 
 

@@ -27,7 +27,7 @@ public:
     
     string currentMessage;
     Tag currentStatus;
-    string timeStamp; //should be dateTime format
+    int timeStamp; //should be dateTime format
 
     
 };

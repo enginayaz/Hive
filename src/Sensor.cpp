@@ -115,6 +115,7 @@ void Sensor::update(){
 			int numPixels = grayDiff.getWidth() * grayDiff.getHeight();
 			for(int i = 0; i < numPixels; i++) {
 				if(pix[i] < nearThreshold && pix[i] > farThreshold) {
+                    //if y is greater than the bottom edge of the table (and make that dynamic), set pix[i] to 0
 					pix[i] = 255;
 				} else {
 					pix[i] = 0;

@@ -3,7 +3,7 @@ using namespace std;
 
 //--------------------------------------------------------------
 void testApp::setup() {
-    mode = TEST_TRACKING; //{FULL, TEST_GRAPHICS, TEST_TRACKING, TEST_WEB};
+    mode = FULL; //{FULL, TEST_GRAPHICS, TEST_TRACKING, TEST_WEB};
     
     ofBackground(0,0,0);    
     	
@@ -91,17 +91,16 @@ void testApp::update() {
         for(int i = 0; i < blobs.size(); i++){
             ofxCvBlob blob = blobs[i];
             
-            
-            
-            
-            
             ofQuaternion secondRect = sensor.refRectangles[1];
             ofQuaternion thirdRect = sensor.refRectangles[2];
             ofQuaternion fourthRect = sensor.refRectangles[3];
             
             float scale = 1.6f; //scaleFrom640x480to400x300
-            float scaledBlobX = blob.boundingRect.x / scale;
-            float scaledBlobY = blob.boundingRect.y / scale;
+            //float scaledBlobX = blob.boundingRect.x / scale;
+            //float scaledBlobY = blob.boundingRect.y / scale;
+            float scaledBlobX = blob.boundingRect.getCenter().x / scale;
+            float scaledBlobY = blob.boundingRect.getCenter().y / scale;
+            
             /*
             cout << "scaledBlobX: " << scaledBlobX << endl;
             cout << "scaledBlobY: " << scaledBlobY << endl;
@@ -134,11 +133,11 @@ void testApp::update() {
                 seats[3].taken = true;
                 //cout << "seats[3].taken: " << seats[3].taken << endl;
             }
-            
+            /*
             cout << "seats[0].taken: " << seats[0].taken << endl; 
             cout << "seats[1].taken: " << seats[1].taken << endl; 
             cout << "seats[2].taken: " << seats[2].taken << endl; 
-            cout << "seats[3].taken: " << seats[3].taken << endl; 
+            cout << "seats[3].taken: " << seats[3].taken << endl; */
             //cout << "seats[2].taken: " << seats[2].taken << endl;
             
         }
@@ -175,7 +174,7 @@ void testApp::update() {
         seats[0].taken = true;
         seats[0].currentMessage = "need to work on the pocode project";
         seats[0].currentStatus = BUSY;
-        seats[0].timeStamp = "10:30";
+        seats[0].timeStamp = 0;
         seats[0].x = 210;  
         seats[0].y = 82; 
         
@@ -183,7 +182,7 @@ void testApp::update() {
         seats[1].taken = true;
         seats[1].currentMessage = "available message";
         seats[1].currentStatus = AVAILABLE;
-        seats[1].timeStamp = "10:30";
+        seats[1].timeStamp = 0;
         seats[1].x = 685; 
         seats[1].y = 82; 
         
@@ -191,7 +190,7 @@ void testApp::update() {
         seats[2].taken = true;
         seats[2].currentMessage = "stuck message";
         seats[2].currentStatus = STUCK;
-        seats[2].timeStamp = "10:30";
+        seats[2].timeStamp = 0  ;
         seats[2].x = 210; 
         seats[2].y = 459; 
         
@@ -225,44 +224,74 @@ void testApp::draw(Seat seat){
     
     ofSetColor(255, 255, 255);
     
+    
+     if(seat.number == 0 || seat.number == 1)
+     {
+         ofPushMatrix();
+         ofTranslate(seat.x /*+ 245*/, seat.y /*+ 171*/); //halo's width and height
+         ofRotate(180);
+        
+     }
+     
+
+    
     halos[status].resize(245, 171);
     halos[status].draw(seat.x, seat.y);
+    bool statusUpdatesInTheLast5Minutes = (time(0) - seat.timeStamp) < 300;
+    cout << "statusUpdatesInTheLast5Minutes: " << statusUpdatesInTheLast5Minutes << endl;
+    
     if(seat.taken){
-        int status = (int)seat.currentStatus; 
-        
-        //cout << "seat: " << seat.number << ". status: " << status << endl; 
-        
-        if(seat.currentStatus != NO_STATUS){
-            logos[status].resize(50, 33);
-            logos[status].draw(seat.x - 60, seat.y - 30);  //w:50, h:33
-            smallLogos[status].resize(24, 22);
-            smallLogos[status].draw(seat.x + 192, seat.y + 122);//w:24, h:22
+        if(statusUpdatesInTheLast5Minutes){
+            int status = (int)seat.currentStatus; 
             
+            //cout << "seat: " << seat.number << ". status: " << status << endl; 
             
-        }           
-        
-        statusTextBoxes[seat.number].setText(seat.currentMessage); 
-        statusTextBoxes[seat.number].wrapTextX(maxTextWidth);
-        
-        ofPushMatrix();
+            if(seat.currentStatus != NO_STATUS){
+                logos[status].resize(50, 33);
+                logos[status].draw(seat.x - 60, seat.y - 30);  //w:50, h:33
+                smallLogos[status].resize(24, 22);
+                smallLogos[status].draw(seat.x + 192, seat.y + 122);//w:24, h:22           
+                
+            }           
+            
+            statusTextBoxes[seat.number].setText(seat.currentMessage); 
+            statusTextBoxes[seat.number].wrapTextX(maxTextWidth);
+            
+            ofPushMatrix();
             ofTranslate(seat.x - 10, seat.y + 13);
             ofRotate(90); 
             ofSetColor(255, 255, 255);
             statusTextBoxes[seat.number].draw(0, 0);
-        ofPopMatrix();         
+            ofPopMatrix();
+        }
+        else{
+            halos[5].resize(245, 171); //5 is the yellow halo, for "welcome"
+            halos[5].draw(seat.x, seat.y);
+            hiveLogo.resize(55, 49);        
+            hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
+            welcomeText.setText(seatURLs[seat.number]);
+            welcomeText.wrapTextX(maxTextWidth);//176
+            welcomeText.draw(seat.x + 35, seat.y + 105); 
+            
+        }
+                 
                
     }  
     
     else{
         halos[5].resize(245, 171); //5 is the yellow halo, for "welcome"
-        halos[5].draw(seat.x, seat.y);
-        
+        halos[5].draw(seat.x, seat.y);        
         hiveLogo.resize(55, 49);        
         hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
-        welcomeText.setText(seatURLs[seat.number]);
-        welcomeText.wrapTextX(maxTextWidth);//176
-        welcomeText.draw(seat.x + 35, seat.y + 105);         
+              
     }
+    
+    
+     if(seat.number == 0 || seat.number == 1)
+     {
+         ofPopMatrix();
+     }
+     
     
 }
 
@@ -394,7 +423,12 @@ void testApp::newResponse(ofxHttpResponse & response){
         
         int seatNumber = atoi(items[1].c_str()) - 1; //equivalent to cast from string to int.            
         
-        seats[seatNumber].timeStamp = items[0];        
+        //seats[seatNumber].timeStamp = items[0];  
+        seats[seatNumber].timeStamp = atoi(items[0].c_str());  
+        cout<<"Time from ruby: " << items[0] <<endl;
+        cout<<"atoi: " << atoi(items[0].c_str()) << endl;
+        cout<<"saved in seat: " << seats[seatNumber].timeStamp << endl << endl;
+        
         seats[seatNumber].currentMessage = items[3];        
         
         if(items[4] == "busy"){
@@ -413,10 +447,6 @@ void testApp::newResponse(ofxHttpResponse & response){
             seats[seatNumber].currentStatus = NO_STATUS;
         } */
         
-        cout << "Seat: " << seatNumber << endl;        
-        cout << "timeStamp: " << seats[seatNumber].timeStamp << endl;
-        cout << "message: " << seats[seatNumber].currentMessage << endl;
-        cout << "status: " << seats[seatNumber].currentStatus << endl << endl;
         
         
     }    
