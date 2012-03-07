@@ -2,9 +2,9 @@
 
 #include "ofMain.h"
 #include "Sensor.h"
-#include "StatusReader.h"
 #include "Seat.h"
 #include "ofxTextSuite.h"
+#include "ofxHttpUtils.h"
 
 
 // uncomment this to read from two kinects simultaneously
@@ -12,9 +12,11 @@
 
 
 
+
+
 enum Mode{FULL, TEST_GRAPHICS, TEST_TRACKING, TEST_WEB};
 
-class testApp : public ofBaseApp {
+class testApp : public ofBaseApp{
 public:
 	
 	void setup();
@@ -28,9 +30,12 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void windowResized(int w, int h);    
     
+    void newStatuses();
+    
     Sensor sensor;
-    StatusReader statusReader;
     Seat seats[4];
+    //vector<Seat> seats; //numberOfSeats, hardcoded.
+    //Seat seat1, seat2, seat3, seat4;
     
     vector<ofImage> halos;
     vector<ofImage> logos;
@@ -45,7 +50,7 @@ public:
 private:
     void draw(Seat seat);
     void drawSeats();   
-    void loadImages();
+    void setupImagesAndFonts();
     
     Mode mode;
     
@@ -57,5 +62,14 @@ private:
     ofxTextBlock welcomeText;
     TextBlockAlignment  alignment;
     int maxTextWidth;
+    
+    //WEB
+    ofxHttpUtils httpUtils;
+    int counter;
+    string responseStr;
+    string requestStr;
+    string action_url;    
+    void requestNewStatuses();
+    void newResponse(ofxHttpResponse & response);
    
 };

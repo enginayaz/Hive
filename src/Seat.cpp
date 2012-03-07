@@ -11,16 +11,22 @@
 
 Seat::Seat(){
     number = 0;
-    status = Status();
     x = 0;
     y = 0;
+    
+    currentMessage = "nothing yet";    
+    currentStatus = NO_STATUS;
+    timeStamp = ""; 
 }
 
 Seat::Seat(int _number){    
-    number = number;
-    status = Status();
+    number = _number;
     x = 0;
     y = 0;
+    
+    currentMessage = "nothing yet";    
+    currentStatus = NO_STATUS;
+    timeStamp = ""; 
 }
 
 

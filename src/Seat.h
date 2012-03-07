@@ -10,7 +10,8 @@
 #ifndef ofxKinectExample_Header_h
 #define ofxKinectExample_Header_h
 
-#include "Status.h"
+
+enum Tag { BUSY, AVAILABLE, STUCK, FEEDBACK, NO_STATUS };
 using namespace std;
 
 
@@ -22,9 +23,12 @@ public:
     
     int number;
     bool taken;
-    //dateTime lastUpdated;
-    Status status;
     int x, y;    
+    
+    string currentMessage;
+    Tag currentStatus;
+    string timeStamp; //should be dateTime format
+
     
 };
 
