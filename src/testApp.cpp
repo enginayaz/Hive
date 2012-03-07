@@ -99,34 +99,47 @@ void testApp::update() {
             ofQuaternion thirdRect = sensor.refRectangles[2];
             ofQuaternion fourthRect = sensor.refRectangles[3];
             
-            if(firstRectLeft< blob.boundingRect.x  && blob.boundingRect.x < firstRectRight 
-               && firstRectBottom < blob.boundingRect.y && blob.boundingRect.y < firstRectTop){
+            float scale = 1.6f; //scaleFrom640x480to400x300
+            float scaledBlobX = blob.boundingRect.x / scale;
+            float scaledBlobY = blob.boundingRect.y / scale;
+            /*
+            cout << "scaledBlobX: " << scaledBlobX << endl;
+            cout << "scaledBlobY: " << scaledBlobY << endl;
+            cout << "thirdRectLeft: " << thirdRectLeft << endl;
+            cout << "thirdRectRight: " << thirdRectRight << endl;
+            cout << "thirdRectBottom: " << thirdRectBottom << endl;
+            cout << "thirdRectTop: " << thirdRectTop << endl;*/
+            
+            if(firstRectLeft < scaledBlobX  && scaledBlobX < firstRectRight 
+               && firstRectTop < scaledBlobY && scaledBlobY < firstRectBottom){
                 
                 seats[0].taken = true;
                 //cout << "seats[0].taken: " << seats[0].taken << endl; 
             }
-            if(secondRectLeft < blob.boundingRect.x  && blob.boundingRect.x < secondRectRight
-               && secondRectBottom < blob.boundingRect.y && blob.boundingRect.y < secondRectTop){
+            if(secondRectLeft < scaledBlobX  && scaledBlobX < secondRectRight
+               && secondRectTop < scaledBlobY && scaledBlobY < secondRectBottom){
                 
                 seats[1].taken = true;
                 //cout << "seats[1].taken: " << seats[1].taken << endl;
             }
-            if(thirdRectLeft < blob.boundingRect.x  && blob.boundingRect.x < thirdRectRight 
-               && thirdRectBottom < blob.boundingRect.y && blob.boundingRect.y < thirdRectTop){
+            if(thirdRectLeft < scaledBlobX  && scaledBlobX < thirdRectRight 
+               && thirdRectTop < scaledBlobY && scaledBlobY < thirdRectBottom){
                 
                 seats[2].taken = true;
                 //cout << "seats[2].taken: " << seats[2].taken << endl;
             }
-            if(fourthRectLeft < blob.boundingRect.x  && blob.boundingRect.x < fourthRectRight 
-               && fourthRectBottom < blob.boundingRect.y && blob.boundingRect.y < fourthRectTop){
+            if(fourthRectLeft < scaledBlobX  && scaledBlobX < fourthRectRight 
+               && fourthRectTop < scaledBlobY && scaledBlobY < fourthRectBottom){
                 
                 seats[3].taken = true;
                 //cout << "seats[3].taken: " << seats[3].taken << endl;
             }
+            
             cout << "seats[0].taken: " << seats[0].taken << endl; 
             cout << "seats[1].taken: " << seats[1].taken << endl; 
             cout << "seats[2].taken: " << seats[2].taken << endl; 
             cout << "seats[3].taken: " << seats[3].taken << endl; 
+            //cout << "seats[2].taken: " << seats[2].taken << endl;
             
         }
         
