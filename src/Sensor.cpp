@@ -106,7 +106,9 @@ void Sensor::update(){
 			grayThreshNear.threshold(nearThreshold, true); //why invert??
 			grayThreshFar.threshold(farThreshold);
             
-			cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayDepthImage.getCvImage(), NULL);
+			cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayDepthImage.getCvImage(), NULL);            
+            
+            
 		} else {
 			
 			// or we do it ourselves - show people how they can work with the pixels
@@ -115,13 +117,26 @@ void Sensor::update(){
 			int numPixels = grayDiff.getWidth() * grayDiff.getHeight();
 			for(int i = 0; i < numPixels; i++) {
 				if(pix[i] < nearThreshold && pix[i] > farThreshold) {
-                    //if y is greater than the bottom edge of the table (and make that dynamic), set pix[i] to 0
+                    
 					pix[i] = 255;
-				} else {
+                    //if y is greater than the bottom edge of the table (and make that dynamic), set pix[i] to 0
+                    //if(i > grayDiff.getWidth() * 377){ //377 is the bottom y pos of the lower halos in kinect space of coordinates (size 640 to 480);                    
+				} 
+                else {
 					pix[i] = 0;
 				}
+                
 			}
 		}
+        
+        //HACK: CALIBRATION: crop image according to site.
+        unsigned char * pix = grayDiff.getPixels();
+        int numPixels = grayDiff.getWidth() * grayDiff.getHeight();
+        for(int i = 0; i < numPixels; i++) {
+            if(i > grayDiff.getWidth() * 377){
+                pix[i] = 0;
+            }
+        }
 		
 		// update the cv images
 		grayDiff.flagImageChanged();
@@ -177,7 +192,7 @@ void Sensor::draw(/*ofBaseApp *parent*/){
 	// draw instructions
 	ofSetColor(255, 255, 255);
 	stringstream reportStream;
-    reportStream << "bg subst. threshold (1,2) is: " << threshold << ". " << endl;
+    reportStream << "press m to toggle full and tracking mode. bg subst. threshold (1,2) is: " << threshold << ". " << endl;
     reportStream << "minArea: " << minArea << "; maxArea: " << maxArea << "." << endl;
 	reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
 	<< ofToString(kinect.getMksAccel().y, 2) << " / "
@@ -253,6 +268,7 @@ void Sensor::keyPressed(int key){
             D.y = mouseY;
              break;
              */
+        
         case '3':
             minArea -= 100;
             break;

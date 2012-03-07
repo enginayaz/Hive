@@ -34,7 +34,7 @@ void testApp::setup() {
     seatURLs.push_back("");
     
     
-    seatURLs[0] = "  goo.gl/zrJVK";
+    seatURLs[0] = "            goo.gl/zrJVK";
     seatURLs[1] = "  goo.gl/gJRVi";
     seatURLs[2] = "  goo.gl/B70xT";
     seatURLs[3] = "  goo.gl/pBYza";
@@ -207,6 +207,7 @@ void testApp::update() {
 
 //--------------------------------------------------------------
 void testApp::draw() {  
+    ofBackground(0,0,0);
     if(mode == TEST_TRACKING){
         sensor.draw(/*this*/); 
     }
@@ -224,21 +225,23 @@ void testApp::draw(Seat seat){
     
     ofSetColor(255, 255, 255);
     
-    
+    ofPushMatrix();
      if(seat.number == 0 || seat.number == 1)
-     {
-         ofPushMatrix();
-         ofTranslate(seat.x /*+ 245*/, seat.y /*+ 171*/); //halo's width and height
+     {         
+         ofTranslate(seat.x + 245, seat.y + 171); //halo's width and height
          ofRotate(180);
         
-     }
-     
+     }   
+    if(seat.number == 2 || seat.number == 3){
+        ofTranslate(seat.x, seat.y);
+    }
 
     
     halos[status].resize(245, 171);
-    halos[status].draw(seat.x, seat.y);
+    halos[status].draw(0, 0);
+    //halos[status].draw(seat.x, seat.y);
     bool statusUpdatesInTheLast5Minutes = (time(0) - seat.timeStamp) < 300;
-    cout << "statusUpdatesInTheLast5Minutes: " << statusUpdatesInTheLast5Minutes << endl;
+    
     
     if(seat.taken){
         if(statusUpdatesInTheLast5Minutes){
@@ -248,9 +251,9 @@ void testApp::draw(Seat seat){
             
             if(seat.currentStatus != NO_STATUS){
                 logos[status].resize(50, 33);
-                logos[status].draw(seat.x - 60, seat.y - 30);  //w:50, h:33
+                logos[status].draw( -60, - 30);  //w:50, h:33
                 smallLogos[status].resize(24, 22);
-                smallLogos[status].draw(seat.x + 192, seat.y + 122);//w:24, h:22           
+                smallLogos[status].draw(192, 122);//w:24, h:22           
                 
             }           
             
@@ -258,7 +261,7 @@ void testApp::draw(Seat seat){
             statusTextBoxes[seat.number].wrapTextX(maxTextWidth);
             
             ofPushMatrix();
-            ofTranslate(seat.x - 10, seat.y + 13);
+            ofTranslate(- 10, 13);
             ofRotate(90); 
             ofSetColor(255, 255, 255);
             statusTextBoxes[seat.number].draw(0, 0);
@@ -266,12 +269,12 @@ void testApp::draw(Seat seat){
         }
         else{
             halos[5].resize(245, 171); //5 is the yellow halo, for "welcome"
-            halos[5].draw(seat.x, seat.y);
+            halos[5].draw(0, 0);
             hiveLogo.resize(55, 49);        
-            hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
+            hiveLogo.draw( 94,  37); //55 x 49        
             welcomeText.setText(seatURLs[seat.number]);
             welcomeText.wrapTextX(maxTextWidth);//176
-            welcomeText.draw(seat.x + 35, seat.y + 105); 
+            welcomeText.draw( 35,  105); 
             
         }
                  
@@ -280,17 +283,16 @@ void testApp::draw(Seat seat){
     
     else{
         halos[5].resize(245, 171); //5 is the yellow halo, for "welcome"
-        halos[5].draw(seat.x, seat.y);        
+        halos[5].draw(0, 0);        
         hiveLogo.resize(55, 49);        
-        hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
+        hiveLogo.draw(94, 37); //55 x 49        
               
     }
     
     
-     if(seat.number == 0 || seat.number == 1)
-     {
-         ofPopMatrix();
-     }
+     
+     ofPopMatrix();
+     
      
     
 }
@@ -304,15 +306,21 @@ void testApp::exit() {
 
 //--------------------------------------------------------------
 void testApp::keyPressed (int key) {
+    switch (key) { 
+        case 'm':
+            
+            if(mode == FULL){
+                mode = TEST_TRACKING;
+            }
+            else if(mode == TEST_TRACKING){
+                mode = FULL;
+            }  
+            cout << "mode: " << mode << endl;
+            break;
+    }
+    
     sensor.keyPressed(key); 
-    /*
-     case 'd':
-     vector<Status> statuses = statusReader.statuses;
-     for(int i = 0; i < statuses.size(); i++){
-     cout << "i: " << i << "(message: " << statuses[i].currentMessage << "; status: " << statuses[i].currentStatus << "; timeStamp: " << statuses[i].timeStamp << "; seat: " << statuses[i].seat << endl;
-     }
-     break;
-     */
+    
 }
 
 void testApp::setupImagesAndFonts(){
@@ -425,9 +433,7 @@ void testApp::newResponse(ofxHttpResponse & response){
         
         //seats[seatNumber].timeStamp = items[0];  
         seats[seatNumber].timeStamp = atoi(items[0].c_str());  
-        cout<<"Time from ruby: " << items[0] <<endl;
-        cout<<"atoi: " << atoi(items[0].c_str()) << endl;
-        cout<<"saved in seat: " << seats[seatNumber].timeStamp << endl << endl;
+        
         
         seats[seatNumber].currentMessage = items[3];        
         
