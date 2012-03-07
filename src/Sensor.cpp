@@ -32,15 +32,15 @@ Sensor::Sensor(){
     
     //colorImg.allocate(kinect.width, kinect.height);
 	//grayImage.allocate(kinect.width, kinect.height);
-	depthBg.allocate(kinect.width, kinect.height);
+	grayBg.allocate(kinect.width, kinect.height);
 	grayDiff.allocate(kinect.width, kinect.height);
 	
-	nearThreshold = 230;
-	farThreshold = 70;
+	nearThreshold = 200;
+	farThreshold = 50;
 	bThreshWithOpenCV = true;
     
-    bLearnBackground = true;
-	bckSubstractionThreshold = 80;
+    
+	threshold = 1;
 	
 	ofSetFrameRate(60);
 	
@@ -50,28 +50,59 @@ Sensor::Sensor(){
 	
 	// start from the front
 	bDrawPointCloud = false;
+    
+    /*
+     A.x = 0;
+     A.y = kinect.height/2;
+     B.x = kinect.width;
+     B.y = kinect.height/2;
+     C.x = kinect.width;
+     C.y = kinect.height;
+     D.x = 0;
+     D.y = kinect.height;
+     
+     */
+    minArea = 3500; // for 11 inch laptop
+    maxArea = 20000; // for 15 inch laptop
+    
+    
+    refRectangles[0] = ofQuaternion(51, 21, 110, 80);
+    refRectangles[1] = ofQuaternion(257, 21, 103, 80);
+    refRectangles[2] = ofQuaternion(257, 156, 96, 80);
+    refRectangles[3] = ofQuaternion(51, 166, 110, 80);
+    
+    
 }
 
 void Sensor::update(){
+    
     kinect.update();
 	
 	// there is a new frame and we are connected
-	if(kinect.isFrameNew()) {
-        
-        //delete background pixels from depth image:
-        //do background substraction from RGB image. pixel positions that are = 0 should be set to 0 in the depth image.
-        //if the kinect can detect a difference between the depth pos of the table and the computers, then this is not necessary: test.
-        
-        //FINDING CONTOURS WITHIN THRESHOLD
+	if(kinect.isFrameNew()) {        
+                
 		
 		// load grayscale depth image from the kinect source
 		grayDepthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
 		
+        //grayDiff.warpPerspective(A, B, C, D); 
+        
+        //background substraction (ours)
+        if (bLearnBakground == true){
+			grayBg = grayDepthImage;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
+			bLearnBakground = false;
+		}
+        
+        grayDiff.absDiff(grayBg, grayDepthImage);
+        grayDiff.threshold(threshold);
+        //
+        
+        
 		// we do two thresholds - one for the far plane and one for the near plane
 		// we then do a cvAnd to get the pixels which are a union of the two thresholds
 		if(bThreshWithOpenCV) {
-			grayThreshNear = grayDepthImage;
-			grayThreshFar = grayDepthImage;
+			grayThreshNear = grayDiff;
+			grayThreshFar = grayDiff;
 			grayThreshNear.threshold(nearThreshold, true); //why invert??
 			grayThreshFar.threshold(farThreshold);
             
@@ -79,9 +110,9 @@ void Sensor::update(){
 		} else {
 			
 			// or we do it ourselves - show people how they can work with the pixels
-			unsigned char * pix = grayDepthImage.getPixels();
+			unsigned char * pix = grayDiff.getPixels();
 			
-			int numPixels = grayDepthImage.getWidth() * grayDepthImage.getHeight();
+			int numPixels = grayDiff.getWidth() * grayDiff.getHeight();
 			for(int i = 0; i < numPixels; i++) {
 				if(pix[i] < nearThreshold && pix[i] > farThreshold) {
 					pix[i] = 255;
@@ -92,11 +123,12 @@ void Sensor::update(){
 		}
 		
 		// update the cv images
-		grayDepthImage.flagImageChanged();
+		grayDiff.flagImageChanged();
 		
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
-		contourFinder.findContours(grayDepthImage, 10, (kinect.width*kinect.height)/2, 20, false);
+       
+		contourFinder.findContours(grayDiff, minArea, maxArea, 20, false);
         
 	}
 	
@@ -106,7 +138,7 @@ void Sensor::update(){
     
 }
 
-void Sensor::draw(ofBaseApp *parent){
+void Sensor::draw(/*ofBaseApp *parent*/){
     ofBackground(100, 100, 100);	
 	ofSetColor(255, 255, 255);
 	
@@ -119,7 +151,21 @@ void Sensor::draw(ofBaseApp *parent){
 		kinect.drawDepth(10, 10, 400, 300);
 		kinect.draw(420, 10, 400, 300);
 		
-		grayDepthImage.draw(10, 320, 400, 300);
+		grayDiff.draw(10, 320, 400, 300);
+        
+        ofSetColor(0,255,0);
+        ofNoFill();
+        /*
+        ofRect(51+10, 21+320, 110, 80);
+        ofRect(257+10, 21+320, 103, 80);
+        ofRect(257+10, 156+320, 96, 80);
+        ofRect(51+10, 166+320, 110, 80);
+         */
+        ofRect(refRectangles[0].x() +10, refRectangles[0].y() +320, refRectangles[0].z(), refRectangles[0].w());
+        ofRect(refRectangles[1].x() +10, refRectangles[1].y() +320, refRectangles[1].z(), refRectangles[1].w());
+        ofRect(refRectangles[2].x() +10, refRectangles[2].y() +320, refRectangles[2].z(), refRectangles[2].w());
+        ofRect(refRectangles[3].x() +10, refRectangles[3].y() +320, refRectangles[3].z(), refRectangles[3].w());
+        
 		contourFinder.draw(10, 320, 400, 300);
 		
 #ifdef USE_TWO_KINECTS
@@ -130,6 +176,8 @@ void Sensor::draw(ofBaseApp *parent){
 	// draw instructions
 	ofSetColor(255, 255, 255);
 	stringstream reportStream;
+    reportStream << "bg subst. threshold (1,2) is: " << threshold << ". " << endl;
+    reportStream << "minArea: " << minArea << "; maxArea: " << maxArea << "." << endl;
 	reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
 	<< ofToString(kinect.getMksAccel().y, 2) << " / "
 	<< ofToString(kinect.getMksAccel().z, 2) << endl
@@ -185,7 +233,48 @@ vector<ofxCvBlob> Sensor::getContours(){
 }
 
 void Sensor::keyPressed(int key){
-    switch (key) {                   
+    switch (key) {     
+            /*
+        case 'a':
+            A.x = mouseX;
+            A.y = mouseY;
+            break;
+        case 's':
+            B.x = mouseX;
+            B.y = mouseY;
+             break;
+        case 'd':
+            C.x = mouseX;
+            C.y = mouseY;
+             break;
+        case 'e':
+            D.x = mouseX;
+            D.y = mouseY;
+             break;
+             */
+        case '3':
+            minArea -= 100;
+            break;
+        case '4':
+            minArea += 100;
+            break;
+        case '5':
+            maxArea -= 100;
+            break;
+        case '6':
+            maxArea +=100;
+            break;
+        case '1':
+            threshold--;
+            if(threshold < 0) threshold = 0;
+            break;
+        case '2': 
+            threshold ++;
+            if(threshold > 255) threshold = 255;
+            break;
+        case 'l':
+			bLearnBakground = true;
+			break;
 		case ' ':
 			bThreshWithOpenCV = !bThreshWithOpenCV;
 			break;

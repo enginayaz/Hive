@@ -20,7 +20,7 @@ class Sensor{
 public: 
     Sensor();
     void update();
-    void draw(ofBaseApp *parent);
+    void draw(/*ofBaseApp *parent*/);
     void close();
     vector<ofxCvBlob> getContours();
     
@@ -38,18 +38,29 @@ public:
 	ofxCvGrayscaleImage grayDepthImage; // grayscale depth image
 	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
 	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
-    ofxCvGrayscaleImage 	grayImage;
-    ofxCvGrayscaleImage 	depthBg;
+    
+    
+    ofxCvGrayscaleImage 	grayBg;
     ofxCvGrayscaleImage 	grayDiff;
     
-    ofxCvContourFinder 	contourFinder;
     
-    int 				bckSubstractionThreshold;
-    bool				bLearnBackground;
+    bool	bLearnBakground;
+    int     threshold;
+    
+    
+    ofxCvContourFinder 	contourFinder;
+
 	
 	
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
+    
+    /*
+     ofPoint A;
+     ofPoint B;
+     ofPoint C;
+     ofPoint D;
+     */
 	
 	int nearThreshold;
 	int farThreshold;
@@ -58,6 +69,11 @@ public:
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
+    
+    int minArea;
+    int maxArea;
+    
+    ofQuaternion refRectangles[4];
     
     
 };

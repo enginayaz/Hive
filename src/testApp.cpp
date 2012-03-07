@@ -3,52 +3,42 @@ using namespace std;
 
 //--------------------------------------------------------------
 void testApp::setup() {
-    mode = TEST_WEB; //{FULL, TEST_GRAPHICS, TEST_TRACKING, TEST_WEB};
+    mode = TEST_TRACKING; //{FULL, TEST_GRAPHICS, TEST_TRACKING, TEST_WEB};
     
     ofBackground(0,0,0);    
     	
     
     //setup initial seats (should be a vector maybe, to make it easier to extend.)
-    numberOfSeats = 4;
-    /*
-    seat1 = Seat(0); 
-    seat1.x = 210;  
-    seat1.y = 82; 
-    
-    seat2 = Seat(1);
-    seat2.x = 685; 
-    seat2.y = 82; 
-    
-    seat3 = Seat(2);
-    seat3.x = 210; 
-    seat3.y = 459;
-    
-    seat4 = Seat(3);
-    seat4.x = 685;  
-    seat4.y = 459;  
-    
-    seats.push_back(seat1);
-    seats.push_back(seat2);
-    seats.push_back(seat3);
-    seats.push_back(seat4);
-     */
+    numberOfSeats = 4;  
     
     seats[0] = Seat(0); 
-    seats[0].x = 210;  
-    seats[0].y = 82; 
+    seats[0].x = 210;  // should be 451
+    seats[0].y = 82; // should be 253
     
     seats[1] = Seat(1);
-    seats[1].x = 685; 
-    seats[1].y = 82; 
+    seats[1].x = 685; // should be 926
+    seats[1].y = 82;  // should be 253
     
     seats[2] = Seat(2);
-    seats[2].x = 210; 
-    seats[2].y = 459;
+    seats[2].x = 685; 
+    seats[2].y = 459; // try 439 
     
     seats[3] = Seat(3);
-    seats[3].x = 685;  
-    seats[3].y = 459;  
+    seats[3].x = 210;  
+    seats[3].y = 459;  // try 439
     
+    
+    seatURLs.push_back("");
+    seatURLs.push_back("");
+    seatURLs.push_back("");
+    seatURLs.push_back("");
+    
+    
+    seatURLs[0] = "  goo.gl/zrJVK";
+    seatURLs[1] = "  goo.gl/gJRVi";
+    seatURLs[2] = "  goo.gl/B70xT";
+    seatURLs[3] = "  goo.gl/pBYza";
+     
     
     setupImagesAndFonts();      
     
@@ -57,8 +47,27 @@ void testApp::setup() {
     ofAddListener(httpUtils.newResponseEvent,this,&testApp::newResponse);
 	httpUtils.start();
     lastWebUpdate = time(0);
-    webUpdateInterval = 1;    
+    webUpdateInterval = 1; // check whether 0.5 works   
     
+    firstRectLeft = sensor.refRectangles[0].x();
+    firstRectRight = sensor.refRectangles[0].x() + sensor.refRectangles[0].z();
+    firstRectTop = sensor.refRectangles[0].y();
+    firstRectBottom = sensor.refRectangles[0].y() + sensor.refRectangles[0].w();
+    
+    secondRectLeft = sensor.refRectangles[1].x();
+    secondRectRight = sensor.refRectangles[1].x() + sensor.refRectangles[1].z();
+    secondRectTop = sensor.refRectangles[1].y();
+    secondRectBottom = sensor.refRectangles[1].y() + sensor.refRectangles[1].w();
+    
+    thirdRectLeft = sensor.refRectangles[2].x();
+    thirdRectRight = sensor.refRectangles[2].x() + sensor.refRectangles[2].z();
+    thirdRectTop = sensor.refRectangles[2].y();
+    thirdRectBottom = sensor.refRectangles[2].y() + sensor.refRectangles[2].w();
+    
+    fourthRectLeft = sensor.refRectangles[3].x();
+    fourthRectRight = sensor.refRectangles[3].x() + sensor.refRectangles[3].z();
+    fourthRectTop = sensor.refRectangles[3].y();
+    fourthRectBottom = sensor.refRectangles[3].y() + sensor.refRectangles[3].w();
     
 }
 
@@ -68,15 +77,63 @@ void testApp::setup() {
 void testApp::update() {
     
     if(mode == TEST_TRACKING || mode == FULL){
+        
         int tolerance = 10; //set distance tolerance
         
         //set all seats as not taken (necessary?)
-        for(int i = 0; i < 4; i++){ //seats # hardcoded!
+        for(int i = 0; i < numberOfSeats; i++){ //seats # hardcoded!
             seats[i].taken = false;
         }
         
         //determine which seats are taken and which are free
         vector<ofxCvBlob> blobs = sensor.getContours();
+        
+        for(int i = 0; i < blobs.size(); i++){
+            ofxCvBlob blob = blobs[i];
+            
+            
+            
+            
+            
+            ofQuaternion secondRect = sensor.refRectangles[1];
+            ofQuaternion thirdRect = sensor.refRectangles[2];
+            ofQuaternion fourthRect = sensor.refRectangles[3];
+            
+            if(firstRectLeft< blob.boundingRect.x  && blob.boundingRect.x < firstRectRight 
+               && firstRectBottom < blob.boundingRect.y && blob.boundingRect.y < firstRectTop){
+                
+                seats[0].taken = true;
+                //cout << "seats[0].taken: " << seats[0].taken << endl; 
+            }
+            if(secondRectLeft < blob.boundingRect.x  && blob.boundingRect.x < secondRectRight
+               && secondRectBottom < blob.boundingRect.y && blob.boundingRect.y < secondRectTop){
+                
+                seats[1].taken = true;
+                //cout << "seats[1].taken: " << seats[1].taken << endl;
+            }
+            if(thirdRectLeft < blob.boundingRect.x  && blob.boundingRect.x < thirdRectRight 
+               && thirdRectBottom < blob.boundingRect.y && blob.boundingRect.y < thirdRectTop){
+                
+                seats[2].taken = true;
+                //cout << "seats[2].taken: " << seats[2].taken << endl;
+            }
+            if(fourthRectLeft < blob.boundingRect.x  && blob.boundingRect.x < fourthRectRight 
+               && fourthRectBottom < blob.boundingRect.y && blob.boundingRect.y < fourthRectTop){
+                
+                seats[3].taken = true;
+                //cout << "seats[3].taken: " << seats[3].taken << endl;
+            }
+            cout << "seats[0].taken: " << seats[0].taken << endl; 
+            cout << "seats[1].taken: " << seats[1].taken << endl; 
+            cout << "seats[2].taken: " << seats[2].taken << endl; 
+            cout << "seats[3].taken: " << seats[3].taken << endl; 
+            
+        }
+        
+        
+        
+        
+        /*
         for(int i = 0; i < blobs.size(); i++){
             ofxCvBlob blob = blobs[i];
             int squaredDistance = pow(abs(blob.boundingRect.x - seats[0].x), 2) + 
@@ -86,7 +143,9 @@ void testApp::update() {
                 seats[i].y = blob.boundingRect.y;
                 seats[i].taken = true;
             }        
-        }    
+        }   
+         */
+         
     }
     if(mode == TEST_WEB || mode == FULL){
         //read user messages
@@ -99,15 +158,15 @@ void testApp::update() {
     
     else if(mode == TEST_GRAPHICS){
         //load fake data.
-        seats[0].number = 1;
+        seats[0].number = 0;
         seats[0].taken = true;
-        seats[0].currentMessage = "need to work on the pocode project due tomorrow";
+        seats[0].currentMessage = "need to work on the pocode project";
         seats[0].currentStatus = BUSY;
         seats[0].timeStamp = "10:30";
         seats[0].x = 210;  
         seats[0].y = 82; 
         
-        seats[1].number = 2;
+        seats[1].number = 1;
         seats[1].taken = true;
         seats[1].currentMessage = "available message";
         seats[1].currentStatus = AVAILABLE;
@@ -115,7 +174,7 @@ void testApp::update() {
         seats[1].x = 685; 
         seats[1].y = 82; 
         
-        seats[2].number = 3;
+        seats[2].number = 2;
         seats[2].taken = true;
         seats[2].currentMessage = "stuck message";
         seats[2].currentStatus = STUCK;
@@ -123,7 +182,7 @@ void testApp::update() {
         seats[2].x = 210; 
         seats[2].y = 459; 
         
-        seats[3].number = 1;
+        seats[3].number = 3;
         seats[3].taken = false;
         seats[3].x = 685;  
         seats[3].y = 459;        
@@ -137,21 +196,19 @@ void testApp::update() {
 //--------------------------------------------------------------
 void testApp::draw() {  
     if(mode == TEST_TRACKING){
-        sensor.draw(this); 
+        sensor.draw(/*this*/); 
     }
-       
-    for(int i = 0; i < numberOfSeats; i++){ 
-        draw(seats[i]);        
-    }    
+    else{
+        for(int i = 0; i < numberOfSeats; i++){ 
+            draw(seats[i]);        
+        }
+    }
+        
     
 }
 
 void testApp::draw(Seat seat){  
-    int status = seat.currentStatus;
-    if(seat.number == 3){
-        cout << "seat " << seat.number << "status at DRAW: " << seat.currentStatus << endl;
-    }
-    
+    int status = seat.currentStatus;    
     
     ofSetColor(255, 255, 255);
     
@@ -169,26 +226,28 @@ void testApp::draw(Seat seat){
             smallLogos[status].draw(seat.x + 192, seat.y + 122);//w:24, h:22
             
             
-        }   
-        /*
-        statusTextBoxes[status].setText(seat.currentMessage); 
-        statusTextBoxes[status].wrapTextX(maxTextWidth);
-        welcomeText.wrapTextX(176); //height: 39.
-        ofPushMatrix();
-            ofTranslate(seat.x - 10, seat.y + 3);
-            ofRotate(90); 
-            statusTextBoxes[status].draw(0, 0);
-        ofPopMatrix();*/
-         
+        }           
         
-         
+        statusTextBoxes[seat.number].setText(seat.currentMessage); 
+        statusTextBoxes[seat.number].wrapTextX(maxTextWidth);
+        
+        ofPushMatrix();
+            ofTranslate(seat.x - 10, seat.y + 13);
+            ofRotate(90); 
+            ofSetColor(255, 255, 255);
+            statusTextBoxes[seat.number].draw(0, 0);
+        ofPopMatrix();         
                
     }  
+    
     else{
+        halos[5].resize(245, 171); //5 is the yellow halo, for "welcome"
+        halos[5].draw(seat.x, seat.y);
+        
         hiveLogo.resize(55, 49);        
         hiveLogo.draw(seat.x + 94, seat.y + 37); //55 x 49        
-        welcomeText.setText("http://itp.nyu.edu/~ea1095/sinatra/hive_v1/seat/" + seat.number );
-        welcomeText.wrapTextX(maxTextWidth);
+        welcomeText.setText(seatURLs[seat.number]);
+        welcomeText.wrapTextX(maxTextWidth);//176
         welcomeText.draw(seat.x + 35, seat.y + 105);         
     }
     

@@ -34,8 +34,6 @@ public:
     
     Sensor sensor;
     Seat seats[4];
-    //vector<Seat> seats; //numberOfSeats, hardcoded.
-    //Seat seat1, seat2, seat3, seat4;
     
     vector<ofImage> halos;
     vector<ofImage> logos;
@@ -63,6 +61,8 @@ private:
     TextBlockAlignment  alignment;
     int maxTextWidth;
     
+    vector<string> seatURLs;
+    
     //WEB
     ofxHttpUtils httpUtils;
     int counter;
@@ -71,5 +71,25 @@ private:
     string action_url;    
     void requestNewStatuses();
     void newResponse(ofxHttpResponse & response);
+    
+    int firstRectLeft;
+    int firstRectRight;
+    int firstRectTop;
+    int firstRectBottom;
+    
+    int secondRectLeft;
+    int secondRectRight;
+    int secondRectTop;
+    int secondRectBottom;
+    
+    int thirdRectLeft;
+    int thirdRectRight;
+    int thirdRectTop;
+    int thirdRectBottom;
+    
+    int fourthRectLeft;
+    int fourthRectRight;
+    int fourthRectTop;
+    int fourthRectBottom;
    
 };
